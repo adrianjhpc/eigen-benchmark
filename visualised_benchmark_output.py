@@ -30,7 +30,7 @@
 #
 # Matrix size: 2000000 iterations: 10 runtime: 0.149294 seconds
 #
-# As we manuallly parse these lines and expect the matrix size and runtime to be in the places
+# As we manually parse these lines and expect the matrix size and runtime to be in the places
 # in the sentence as above.
 #
 # We also expect the program to be run in a batch script that has output like this:
@@ -94,6 +94,7 @@ print("Processing " + filename)
 
 data_array = readfile(filename)
 
+#fig, ax = plt.subplots(2,1)
 fig = plt.figure()
 ax = plt.axes()
     
@@ -101,14 +102,21 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=plt.cm.Set2.colors)
 
 x_points = None
 first_run = True
+table = []
+row_labels = []
+rows = len(data_array)
 
-for element in data_array:
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+for place, element in enumerate(data_array):
     data_part = element[1:]
+    row_labels.append(element[0])
     if(first_run):
         x_points = np.array([item[0] for item in data_part], dtype=int)
         first_run = False
     runtimes = np.array([item[2] for item in data_part], dtype=float)
-    plt.scatter(x_points, runtimes, label=element[0])
+    table.append(runtimes)
+    plt.scatter(x_points, runtimes, label=element[0], color=colors[place])
 
 plt.ylabel('Runtime (seconds)')
 plt.xlabel('Matrix size')
@@ -120,3 +128,18 @@ plt.tight_layout()
 
 plt.savefig(filename+"_output.png",format="png")
 
+plt.clf()
+plt.cla()
+plt.close()
+ax = plt.axes()
+ax.axis('off')
+ax.axis('tight')
+table_pic = plt.table(table, cellColours=None, cellLoc='right', colWidths=None, rowLabels=row_labels, rowColours=colors, rowLoc='left', colLabels=x_points, colColours=['grey']*len(table[0]), colLoc='center', loc='center', edges='closed')
+
+table_pic.auto_set_font_size(False)
+table_pic.set_fontsize(10)
+table_pic.scale(2,2)
+
+plt.tight_layout()
+
+plt.savefig(filename+"_table_output.png",bbox_inches='tight',format="png")
